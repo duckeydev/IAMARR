@@ -1,0 +1,101 @@
+version: "3.7"
+services:
+  # Radarr - Movie collection manager
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config/radarr:/config
+      - ./data/media/movies:/movies
+      - ./data/torrents/movies:/downloads
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
+  # Bazarr - Subtitle management (optional)
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config/bazarr:/config
+      - ./data/media/movies:/movies
+      - ./data/media/tv:/tv
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+
+  # Transmission - alternative torrent client (optional)
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config/transmission:/config
+      - ./data/torrents/movies:/downloads
+    ports:
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
+    restart: unless-stopped
+
+  # Jellyfin - Media server for streaming (optional, recommended)
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config/jellyfin:/config
+      - ./data/media:/media
+      - ./data/torrents:/downloads
+    ports:
+      - 8096:8096
+    restart: unless-stopped
+
+  # Overseerr - Requests front-end (optional)
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: overseerr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./config/overseerr:/config
+    ports:
+      - 5055:5055
+    restart: unless-stopped
+
+  # Sonarr - TV manager (optional)
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./config/sonarr:/config
+      - ./data/media/tv:/tv
+      - ./data/torrents/tv:/downloads
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+
+# Note: This compose file intentionally focuses on movie-related services.
+# If you already run Prowlarr/qBittorrent from the music stack, reuse them
+# by adding them as downloaders/indexers inside Radarr/Overseerr instead
+# of running duplicate containers to avoid port/container-name conflicts.
