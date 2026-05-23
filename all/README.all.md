@@ -18,14 +18,15 @@ Start the whole stack:
 
 ```bash
 cd /home/ducky/Desktop/Arr
-./setup.sh
+./auto_wire.sh
 ```
 
 Notes:
 - The compose uses `PUID=1000`/`PGID=1000`; change if needed.
+- `auto_wire.sh` now clones or updates the default repo, seeds Arr app credentials/API keys into config files, and then starts the stack.
+- qBittorrent still prints its temporary Web UI password in logs on first boot; the script reminds you where to find it.
 - If you already run per-domain stacks (musicOnly/movies), prefer reusing `Prowlarr` and download clients to avoid duplicates.
- - If you already run per-domain stacks (musicOnly/movies), prefer reusing `Prowlarr` and download clients to avoid duplicates.
 
 Automation note:
-- `setup.sh` will create a `.env` with your `PUID`/`PGID` and start the full stack. It waits for the main web UIs to respond and prints next steps.
-- I can further automate wiring apps (Radarr/Lidarr/Sonarr -> Prowlarr and download clients) but that requires the initial API keys/passwords which are created during first-run in the web UIs. If you want full automation, run the stack once, share the generated API keys and I will script the rest.
+- `setup.sh` still starts the local compose stack with a minimal `.env` when you do not want the clone-and-seed bootstrap.
+- `auto_wire.sh` is the hands-off path for the GitHub repo default and is the recommended entry point for a fresh install.
